@@ -1,6 +1,7 @@
 package teamwork
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -74,7 +75,12 @@ func Connect(ApiToken string) (*Connection, error) {
 
 // request is the base level function for calling the TeamWork API.
 func request(token, method, url string) (io.ReadCloser, http.Header, error) {
-	client := &http.Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
+	}
+	client := &http.Client{Transport: tr}
 	req, err := http.NewRequest(method, url, nil) // TODO: Add payload to support POST
 	if err != nil {
 		log.Printf("NewRequest: ", err)
